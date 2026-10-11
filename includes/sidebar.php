@@ -34,33 +34,39 @@ $adminMenuItems = [
     ],
     [
         'key' => 'students',
-        'label' => 'Manage Students',
+        'label' => 'Students',
         'icon' => 'bi-people',
         'url' => 'students.php',
     ],
     [
-        'key' => 'chapters',
-        'label' => 'Chapters',
-        'icon' => 'bi-book',
-        'url' => 'chapters.php',
+        'key' => 'navigator',
+        'label' => 'Notes',
+        'icon' => 'bi-journal-richtext',
+        'url' => 'navigator.php',
     ],
     [
         'key' => 'notes',
-        'label' => 'Browse Notes',
-        'icon' => 'bi-journal-richtext',
-        'url' => 'notes.php',
-    ],
-    [
-        'key' => 'scan',
-        'label' => 'Scan Notes',
-        'icon' => 'bi-folder-symlink',
-        'url' => 'scan-notes.php',
+        'label' => 'Add Note',
+        'icon' => 'bi-plus-square',
+        'url' => 'note-edit.php',
     ],
     [
         'key' => 'permissions',
         'label' => 'Chapter Permissions',
         'icon' => 'bi-shield-lock',
         'url' => 'chapter-permissions.php',
+    ],
+    [
+        'key' => 'questions',
+        'label' => 'Question Bank',
+        'icon' => 'bi-question-diamond',
+        'url' => 'questions.php',
+    ],
+    [
+        'key' => 'quizzes',
+        'label' => 'Quiz Generator',
+        'icon' => 'bi-clipboard-check',
+        'url' => 'quizzes.php',
     ],
 ];
 
@@ -70,6 +76,18 @@ $studentMenuItems = [
         'label' => 'Dashboard',
         'icon' => 'bi-grid-1x2',
         'url' => 'index.php',
+    ],
+    [
+        'key' => 'quizzes',
+        'label' => 'My Quizzes',
+        'icon' => 'bi-clipboard-check',
+        'url' => 'quizzes.php',
+    ],
+    [
+        'key' => 'profile',
+        'label' => 'My Profile',
+        'icon' => 'bi-person-circle',
+        'url' => 'profile.php',
     ],
 ];
 

@@ -19,7 +19,7 @@ require_once __DIR__ . '/config/database.php';
 
 if (!empty($_SESSION['user_id'])) {
   if (($_SESSION['role'] ?? '') === 'admin') {
-    redirect('/lectures/admin/index.php');
+    redirect('/lectures/admin/navigator.php');
   }
 
   redirect('/lectures/student/index.php');
