@@ -39,16 +39,16 @@ $adminMenuItems = [
         'url' => 'students.php',
     ],
     [
+        'key' => 'academic',
+        'label' => 'Academic',
+        'icon' => 'bi-diagram-3',
+        'url' => 'academic.php',
+    ],
+    [
         'key' => 'navigator',
         'label' => 'Notes',
         'icon' => 'bi-journal-richtext',
         'url' => 'navigator.php',
-    ],
-    [
-        'key' => 'notes',
-        'label' => 'Add Note',
-        'icon' => 'bi-plus-square',
-        'url' => 'note-edit.php',
     ],
     [
         'key' => 'permissions',

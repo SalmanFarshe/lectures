@@ -157,14 +157,14 @@ require_once __DIR__ . '/../includes/header.php';
         <a class="btn btn-primary mt-2" href="/lectures/admin/navigator.php">Back to Classes</a>
     </div></div>
 
-<?php elseif ($subjectId > 0 && !$currentSubject): ?>
+<?php elseif ($subjectId > 0 && $chapterId == 0 && !$currentSubject): ?>
     <div class="panel"><div class="empty-state">
         <i class="bi bi-exclamation-circle fs-1 d-block mb-2"></i>
         <h5 class="fw-bold">Subject not found</h5>
         <a class="btn btn-primary mt-2" href="/lectures/admin/navigator.php">Back to Classes</a>
     </div></div>
 
-<?php elseif ($classId > 0 && !$currentClass): ?>
+<?php elseif ($classId > 0 && $subjectId == 0 && $chapterId == 0 && !$currentClass): ?>
     <div class="panel"><div class="empty-state">
         <i class="bi bi-exclamation-circle fs-1 d-block mb-2"></i>
         <h5 class="fw-bold">Class not found</h5>

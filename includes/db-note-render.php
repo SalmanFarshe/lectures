@@ -35,6 +35,15 @@ $readerJumpBase = (string)($readerJumpBase ?? '');
 $activePage = $activePage ?? 'dashboard';
 $showSidebar = $showSidebar ?? true;
 
+// Normalize the stored PDF path into a browser-reachable web URL.
+// Stored paths are relative to the project root (e.g. "uploads/notes/x.pdf"),
+// but the viewer runs from a subfolder, so a raw relative src resolves wrongly
+// and 404s. Leave absolute (/) and full (scheme://) URLs untouched.
+$pdfSrc = (string)($dbNote['pdf_path'] ?? '');
+if ($pdfSrc !== '' && $pdfSrc[0] !== '/' && !preg_match('#^[a-z][a-z0-9+.-]*://#i', $pdfSrc)) {
+    $pdfSrc = '/lectures/' . ltrim($pdfSrc, '/');
+}
+
 $pageTitle = $readerTitle;
 
 require __DIR__ . '/header.php';
@@ -156,10 +165,10 @@ require __DIR__ . '/header.php';
     <?php endif; ?>
 
     <div class="db-note-body">
-        <?php if (($dbNote['content_type'] ?? '') === 'pdf' && !empty($dbNote['pdf_path'])): ?>
+        <?php if (($dbNote['content_type'] ?? '') === 'pdf' && $pdfSrc !== ''): ?>
             <iframe
                 class="db-pdf-frame"
-                src="<?= e((string)$dbNote['pdf_path']) ?>"
+                src="<?= e($pdfSrc) ?>"
                 title="<?= e($readerTitle) ?>"
                 loading="lazy"></iframe>
         <?php elseif (($dbNote['content_type'] ?? '') === 'html'): ?>

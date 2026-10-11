@@ -488,6 +488,54 @@ require_once __DIR__ . '/../includes/header.php';
             return;
         }
 
+        // Remember all chapters so we can restore the full list when needed.
+        const allChapterOptions = Array.from(chapterSelect.querySelectorAll('option')).slice(1);
+
+        function setChapterOptions(list, classId) {
+            // Keep the leading "Select chapter" placeholder.
+            chapterSelect.innerHTML = '<option value="">Select chapter</option>';
+            list.forEach(function (opt) {
+                const o = document.createElement('option');
+                o.value = opt.value;
+                o.textContent = opt.textContent;
+                o.dataset.classId = classId;
+                chapterSelect.appendChild(o);
+            });
+        }
+
+        function loadChaptersForStudent() {
+            const studentOption = studentSelect.options[studentSelect.selectedIndex];
+            const classId = studentOption ? studentOption.dataset.classId : '';
+
+            if (!classId || classId === '0') {
+                // No class assigned — show every chapter.
+                setChapterOptions(allChapterOptions, '');
+                checkClassMatch();
+                return;
+            }
+
+            // Show only chapters that belong to the selected student's class.
+            chapterSelect.innerHTML = '<option value="">Loading chapters…</option>';
+            fetch('/lectures/admin/ajax-options.php?field=chapter_by_class&class_id=' + encodeURIComponent(classId))
+                .then(function (r) { return r.json(); })
+                .then(function (list) {
+                    chapterSelect.innerHTML = '<option value="">Select chapter</option>';
+                    (list || []).forEach(function (item) {
+                        const o = document.createElement('option');
+                        o.value = item.id;
+                        o.textContent = item.name;
+                        o.dataset.classId = classId;
+                        chapterSelect.appendChild(o);
+                    });
+                    checkClassMatch();
+                })
+                .catch(function () {
+                    // On failure, fall back to the full list rather than blocking.
+                    setChapterOptions(allChapterOptions, '');
+                    checkClassMatch();
+                });
+        }
+
         function checkClassMatch() {
             const studentOption = studentSelect.options[studentSelect.selectedIndex];
             const chapterOption = chapterSelect.options[chapterSelect.selectedIndex];
@@ -502,7 +550,9 @@ require_once __DIR__ . '/../includes/header.php';
             warning.classList.toggle('d-none', !mismatch);
         }
 
-        studentSelect.addEventListener('change', checkClassMatch);
+        studentSelect.addEventListener('change', function () {
+            loadChaptersForStudent();
+        });
         chapterSelect.addEventListener('change', checkClassMatch);
     });
 </script>

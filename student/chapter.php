@@ -158,7 +158,92 @@ if (!$chapter) {
 
 /*
 |--------------------------------------------------------------------------
-| Validate Note File Path
+| Database-backed note (primary path)
+|--------------------------------------------------------------------------
+| Notes now live in the `notes` table. If this chapter has an active note
+| stored in the database, render it through the unified DB renderer, which
+| supports both HTML and PDF content while preserving all permission checks
+| above. Falls back to the legacy file-based note only if none exists.
+*/
+$dbNoteStmt = $pdo->prepare(
+    "SELECT n.*
+     FROM notes n
+     WHERE n.chapter_id = ?
+       AND n.is_active = 1
+     ORDER BY n.sort_order ASC, n.id ASC"
+);
+$dbNoteStmt->execute([$chapterId]);
+$dbNotes = $dbNoteStmt->fetchAll();
+
+if ($dbNotes) {
+    // Load every chapter this student may access (for the on-page switcher).
+    $accessibleStmt = $pdo->prepare(
+        "SELECT
+            ch.id,
+            ch.title,
+            sub.name AS subject_name
+         FROM chapter_permissions cp
+         INNER JOIN chapters ch ON ch.id = cp.chapter_id
+         INNER JOIN subjects sub ON sub.id = ch.subject_id
+         INNER JOIN classes cl ON cl.id = sub.class_id
+         WHERE cp.user_id = ?
+           AND ch.is_active = 1
+           AND sub.is_active = 1
+           AND cl.is_active = 1
+           AND cl.id = ?
+         ORDER BY sub.name ASC, ch.title ASC"
+    );
+    $accessibleStmt->execute([$userId, $student['class_id']]);
+    $readerChapters = [];
+    foreach ($accessibleStmt->fetchAll() as $ac) {
+        $readerChapters[] = [
+            'id'      => (int)$ac['id'],
+            'title'   => (string)$ac['title'],
+            'subject' => (string)$ac['subject_name'],
+        ];
+    }
+
+    $readerMeta = [
+        'class'   => (string)($chapter['class_name'] ?? ''),
+        'subject' => (string)($chapter['subject_name'] ?? ''),
+    ];
+    $readerBack = '/lectures/student/index.php';
+    $readerBackLabel = 'Back to Dashboard';
+    $activePage = 'dashboard';
+    $showSidebar = false; // Student note view uses a full-width layout without the sidebar
+    $readerCurrentId = (int)$chapter['id'];
+    $readerJumpBase = '/lectures/student/chapter.php';
+
+    /*
+    | If a specific note is requested, render just that note through the
+    | unified DB renderer. Otherwise show the list of all notes in the
+    | chapter so the student can choose which one to open.
+    */
+    $requestedNoteId = (int)($_GET['note_id'] ?? 0);
+    $dbNote = null;
+    if ($requestedNoteId > 0) {
+        foreach ($dbNotes as $candidate) {
+            if ((int)$candidate['id'] === $requestedNoteId) {
+                $dbNote = $candidate;
+                break;
+            }
+        }
+    }
+
+    if ($dbNote !== null) {
+        $readerTitle = (string)$chapter['title'];
+        require __DIR__ . '/../includes/db-note-render.php';
+        exit;
+    }
+
+    // No specific note selected -> show all notes in this chapter.
+    require __DIR__ . '/../includes/student-notes-list.php';
+    exit;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Validate Note File Path (legacy file-based notes)
 |--------------------------------------------------------------------------
 | Expected example:
 | notes/hsc/physics_1st_paper/chapter_1_chaptername_ekhane.php

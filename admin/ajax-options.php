@@ -26,4 +26,23 @@ if ($field === 'chapter') {
     exit;
 }
 
+if ($field === 'chapter_by_class') {
+    $classId = (int)($_GET['class_id'] ?? 0);
+    if ($classId < 1) { echo '[]'; exit; }
+    $st = $pdo->prepare(
+        "SELECT ch.id, CONCAT(cl.name, ' → ', sub.name, ' → ', ch.title) AS name
+         FROM chapters ch
+         INNER JOIN subjects sub ON sub.id = ch.subject_id
+         INNER JOIN classes cl ON cl.id = sub.class_id
+         WHERE cl.id = ?
+           AND ch.is_active = 1
+           AND sub.is_active = 1
+           AND cl.is_active = 1
+         ORDER BY sub.name ASC, ch.title ASC"
+    );
+    $st->execute([$classId]);
+    echo json_encode($st->fetchAll(), JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
 echo '[]';
