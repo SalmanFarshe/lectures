@@ -184,3 +184,37 @@ require __DIR__ . '/header.php';
 </div>
 
 <?php require __DIR__ . '/footer.php'; ?>
+
+<?php
+/*
+|--------------------------------------------------------------------------
+| Auto-load MathJax for HTML notes
+|--------------------------------------------------------------------------
+| Equations only render when MathJax is configured and loaded. Rather than
+| making authors paste the MathJax setup into every note, inject it here so
+| all HTML notes render formulas automatically. We skip injection when the
+| pasted HTML already references MathJax, to avoid loading it twice.
+*/
+$htmlContent = (string)($dbNote['html_content'] ?? '');
+$needsMathjax = (($dbNote['content_type'] ?? '') === 'html')
+    && $htmlContent !== ''
+    && stripos($htmlContent, 'mathjax') === false;
+?>
+<?php if ($needsMathjax): ?>
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(', '\\)'], ['$', '$']],
+    displayMath: [['\\[', '\\]'], ['$$', '$$']]
+  },
+  options: {
+    skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  startup: {
+    typeset: true
+  }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<?php endif; ?>
+
