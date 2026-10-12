@@ -104,9 +104,178 @@ require __DIR__ . '/header.php';
         overflow: hidden;
     }
 
-    /* Isolated container for pasted HTML so it does not disturb app chrome. */
+    /* Isolated, themed container for pasted HTML notes. */
     .db-html-note {
-        padding: 8px 14px 20px;
+        padding: 10px 26px 32px;
+        color: var(--text);
+        font-family: 'Hind Siliguri', 'Noto Sans Bengali', 'Segoe UI', system-ui, sans-serif;
+        font-size: 16.5px;
+        line-height: 1.95;
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
+    }
+
+    /* Inner readable column so long lines don't stretch too wide. */
+    .db-html-note > * {
+        max-width: 860px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* ---- Headings: handwritten Bengali accent font ---- */
+    .db-html-note h1,
+    .db-html-note h2,
+    .db-html-note h3,
+    .db-html-note h4,
+    .db-html-note h5,
+    .db-html-note h6 {
+        font-family: 'Galada', 'Hind Siliguri', 'Noto Sans Bengali', cursive;
+        color: var(--text);
+        line-height: 1.6;
+        letter-spacing: 0.2px;
+        margin: 34px 0 12px;
+    }
+
+    .db-html-note h1 {
+        font-size: 30px;
+        padding-bottom: 12px;
+        border-bottom: 3px solid var(--primary-soft);
+        margin-top: 8px;
+    }
+
+    .db-html-note h2 {
+        font-size: 25px;
+        padding-left: 14px;
+        border-left: 5px solid var(--primary);
+    }
+
+    .db-html-note h3 { font-size: 21px; }
+    .db-html-note h4 { font-size: 18px; color: var(--primary-hover); }
+    .db-html-note h5 { font-size: 16.5px; color: var(--primary-hover); }
+    .db-html-note h6 { font-size: 15px; color: var(--muted); }
+
+    /* ---- Paragraphs & inline text ---- */
+    .db-html-note p {
+        margin: 0 0 16px;
+        color: var(--text);
+    }
+
+    .db-html-note strong,
+    .db-html-note b {
+        font-weight: 700;
+        color: var(--text);
+    }
+
+    .db-html-note em,
+    .db-html-note i {
+        font-style: italic;
+        color: var(--primary-hover);
+    }
+
+    .db-html-note u { text-decoration-color: var(--primary); }
+
+    .db-html-note small { color: var(--muted); font-size: 13px; }
+
+    .db-html-note mark {
+        background: var(--warning-soft);
+        color: #7c4a03;
+        padding: 1px 6px;
+        border-radius: 6px;
+    }
+
+    .db-html-note a {
+        color: var(--primary);
+        font-weight: 600;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+
+    .db-html-note a:hover { color: var(--primary-hover); }
+
+    /* ---- Blockquote ---- */
+    .db-html-note blockquote {
+        margin: 18px 0;
+        padding: 12px 20px;
+        color: var(--muted);
+        background: var(--bg);
+        border-left: 4px solid var(--primary);
+        border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    }
+
+    .db-html-note blockquote p:last-child { margin-bottom: 0; }
+
+    /* ---- Lists ---- */
+    .db-html-note ul,
+    .db-html-note ol {
+        margin: 0 0 16px;
+        padding-left: 26px;
+    }
+
+    .db-html-note li { margin: 6px 0; }
+    .db-html-note li::marker { color: var(--primary); font-weight: 700; }
+
+    /* ---- Inline code & pre ---- */
+    .db-html-note code {
+        font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.9em;
+        color: #b5306b;
+        background: var(--primary-soft);
+        padding: 2px 7px;
+        border-radius: 6px;
+    }
+
+    .db-html-note pre {
+        margin: 16px 0;
+        padding: 16px 18px;
+        background: #0F172A;
+        color: #E2E8F0;
+        border-radius: var(--radius-sm);
+        overflow-x: auto;
+        line-height: 1.6;
+    }
+
+    .db-html-note pre code {
+        background: transparent;
+        color: inherit;
+        padding: 0;
+    }
+
+    /* ---- Tables ---- */
+    .db-html-note table {
+        width: 100%;
+        margin: 18px 0;
+        border-collapse: collapse;
+        font-size: 15px;
+    }
+
+    .db-html-note th,
+    .db-html-note td {
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        text-align: left;
+    }
+
+    .db-html-note thead th {
+        background: var(--primary-soft);
+        color: var(--primary-hover);
+        font-weight: 700;
+    }
+
+    .db-html-note tbody tr:nth-child(even) { background: var(--bg); }
+
+    /* ---- Images ---- */
+    .db-html-note img {
+        max-width: 100%;
+        height: auto;
+        border-radius: var(--radius-sm);
+        margin: 12px 0;
+    }
+
+    /* ---- Horizontal rule ---- */
+    .db-html-note hr {
+        margin: 28px 0;
+        border: 0;
+        border-top: 1px solid var(--border);
     }
 
     .db-pdf-frame {

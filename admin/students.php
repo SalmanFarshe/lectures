@@ -204,6 +204,85 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             goBack('Student details updated successfully.');
         }
 
+        /*
+        | Account requests (registration + password reset) — admin review.
+        */
+        if ($action === 'approve_request') {
+            $requestId = filter_var($_POST['request_id'] ?? null, FILTER_VALIDATE_INT);
+
+            if (!$requestId || $requestId < 1) {
+                goBack('Invalid request ID.', 'danger');
+            }
+
+            $reqStmt = $pdo->prepare('SELECT * FROM account_requests WHERE id = ? AND status = \'pending\' LIMIT 1');
+            $reqStmt->execute([$requestId]);
+            $req = $reqStmt->fetch();
+
+            if (!$req) {
+                goBack('Request not found or already processed.', 'warning');
+            }
+
+            if ((string)$req['type'] === 'register') {
+                // Create the student account from the approved registration.
+                $check = $pdo->prepare('SELECT COUNT(*) FROM users WHERE username = ?');
+                $check->execute([(string)$req['username']]);
+                if ((int)$check->fetchColumn() > 0) {
+                    goBack('A user with this username already exists.', 'danger');
+                }
+
+                $create = $pdo->prepare(
+                    "INSERT INTO users (username, password_hash, full_name, role, class_id, is_active)
+                     VALUES (?, ?, ?, 'student', ?, 1)"
+                );
+                $create->execute([
+                    (string)$req['username'],
+                    (string)$req['password_hash'],
+                    (string)$req['full_name'],
+                    $req['class_id'] !== null ? (int)$req['class_id'] : null,
+                ]);
+            } else {
+                // password_reset: apply the requested password hash.
+                $apply = $pdo->prepare(
+                    "UPDATE users SET password_hash = ?
+                     WHERE username = ? AND role = 'student' AND is_active = 1"
+                );
+                $apply->execute([(string)$req['password_hash'], (string)$req['username']]);
+
+                if ($apply->rowCount() === 0) {
+                    goBack('No active account found for this reset request.', 'danger');
+                }
+            }
+
+            $mark = $pdo->prepare(
+                "UPDATE account_requests
+                 SET status = 'approved', reviewed_at = NOW(), reviewed_by = ?
+                 WHERE id = ?"
+            );
+            $mark->execute([(int)$_SESSION['user_id'], $requestId]);
+
+            goBack('Request approved successfully.');
+        }
+
+        if ($action === 'reject_request') {
+            $requestId = filter_var($_POST['request_id'] ?? null, FILTER_VALIDATE_INT);
+
+            if (!$requestId || $requestId < 1) {
+                goBack('Invalid request ID.', 'danger');
+            }
+
+            $mark = $pdo->prepare(
+                "UPDATE account_requests
+                 SET status = 'rejected', reviewed_at = NOW(), reviewed_by = ?
+                 WHERE id = ? AND status = 'pending'"
+            );
+            $mark->execute([(int)$_SESSION['user_id'], $requestId]);
+
+            goBack(
+                $mark->rowCount() ? 'Request rejected.' : 'Request not found or already processed.',
+                $mark->rowCount() ? 'warning' : 'warning'
+            );
+        }
+
         goBack('Unknown action.', 'danger');
     } catch (PDOException $exception) {
         error_log($exception->getMessage());
@@ -268,6 +347,20 @@ $activeStudents = (int) $pdo->query(
 )->fetchColumn();
 
 $inactiveStudents = $totalStudents - $activeStudents;
+
+/*
+| Pending account requests (registration + password reset) awaiting review.
+*/
+$pendingRequests = $pdo->query(
+    "SELECT ar.id, ar.type, ar.full_name, ar.username, ar.created_at,
+            c.name AS class_name
+     FROM account_requests ar
+     LEFT JOIN classes c ON c.id = ar.class_id
+     WHERE ar.status = 'pending'
+     ORDER BY ar.created_at ASC"
+)->fetchAll();
+
+$pendingRequestCount = count($pendingRequests);
 
 $flash = $_SESSION['student_flash'] ?? null;
 unset($_SESSION['student_flash']);
@@ -792,6 +885,73 @@ require_once __DIR__ . '/../includes/header.php';
         <i class="bi bi-plus-lg me-2"></i> Add New Student
     </button>
 </div>
+
+<!-- Pending Account Requests (registration + password reset) -->
+<?php if ($pendingRequestCount > 0): ?>
+<section class="table-card" style="border-left:4px solid var(--warning); margin-bottom:20px;">
+    <div class="table-card-head">
+        <div>
+            <h2 class="section-title">
+                <i class="bi bi-inbox me-1"></i> Pending Requests (<?= $pendingRequestCount ?>)
+            </h2>
+            <div class="section-subtitle">
+                Registration and password-reset requests awaiting your review
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Username</th>
+                    <th>Class</th>
+                    <th>Submitted</th>
+                    <th class="text-end">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($pendingRequests as $req): ?>
+                    <tr>
+                        <td>
+                            <?php if ((string)$req['type'] === 'register'): ?>
+                                <span class="badge badge-soft-primary">Registration</span>
+                            <?php else: ?>
+                                <span class="badge badge-soft-warning">Password Reset</span>
+                            <?php endif; ?>
+                        </td>
+                        <td class="fw-bold"><?= e((string)($req['full_name'] ?? '—')) ?></td>
+                        <td><?= e((string)$req['username']) ?></td>
+                        <td><?= e((string)($req['class_name'] ?? '—')) ?></td>
+                        <td class="small text-secondary"><?= e((string)$req['created_at']) ?></td>
+                        <td class="text-end">
+                            <form method="post" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
+                                <input type="hidden" name="action" value="approve_request">
+                                <input type="hidden" name="request_id" value="<?= (int)$req['id'] ?>">
+                                <button type="submit" class="btn btn-sm btn-success"
+                                    onclick="return confirm('Approve this request?');">
+                                    <i class="bi bi-check-lg me-1"></i> Approve
+                                </button>
+                            </form>
+                            <form method="post" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
+                                <input type="hidden" name="action" value="reject_request">
+                                <input type="hidden" name="request_id" value="<?= (int)$req['id'] ?>">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Reject this request?');">
+                                    <i class="bi bi-x-lg me-1"></i> Reject
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</section>
+<?php endif; ?>
 
 <!-- Summary Cards -->
 <div class="row g-3">

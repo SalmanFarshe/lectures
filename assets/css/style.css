@@ -557,6 +557,103 @@ img {
     white-space: nowrap;
 }
 
+/* ---------- Profile dropdown (topbar) ---------- */
+
+.topbar-profile-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: var(--shadow-sm);
+    transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+}
+
+.topbar-profile-btn:hover,
+.topbar-profile-btn:focus-visible {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+    color: var(--primary-hover);
+    box-shadow: var(--shadow);
+}
+
+.topbar-profile-btn > .bi-person-circle {
+    color: var(--primary);
+    font-size: 24px;
+    line-height: 1;
+}
+
+.topbar-profile-btn .topbar-caret {
+    font-size: 10px;
+    color: var(--muted);
+    margin-left: 2px;
+    transition: transform .2s ease;
+}
+
+.topbar-profile-btn[aria-expanded="true"] .topbar-caret {
+    transform: rotate(180deg);
+}
+
+.topbar-profile-name {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-menu {
+    min-width: 250px;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.profile-menu-head {
+    padding: 16px 18px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+}
+
+.profile-menu-name {
+    font-weight: 750;
+    color: var(--text);
+    font-size: 15px;
+}
+
+.profile-menu-meta {
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.profile-menu-meta > .bi{
+    font-size: 13px !important;
+} 
+
+.profile-menu-item > .bi{
+    font-size: 18px !important;
+}
+
+.profile-menu-item {
+    padding: 11px 18px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.profile-menu-item.text-danger:hover {
+    background: var(--danger-soft);
+}
+
 /* ---------- Mobile Menu Button ---------- */
 
 .mobile-menu-btn {
@@ -709,6 +806,200 @@ img {
 .welcome-banner p {
     margin: 0;
     color: rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- Welcome banner accents ---------- */
+
+.welcome-tag {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 12px;
+    margin-bottom: 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.dash-banner-icon {
+    position: absolute;
+    z-index: 1;
+    right: 24px;
+    bottom: 12px;
+    font-size: 92px;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.18);
+}
+
+/* ---------- Section cards (dashboard panels) ---------- */
+
+.section-card {
+    height: 100%;
+    overflow: hidden;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+}
+
+.section-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 750;
+}
+
+.section-subtitle {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.text-link {
+    color: var(--primary);
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.text-link:hover {
+    color: var(--primary-hover);
+}
+
+/* ---------- Quick actions ---------- */
+
+.quick-actions {
+    padding: 18px;
+}
+
+.quick-action {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 15px;
+    margin-bottom: 11px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    text-decoration: none;
+    transition: border-color .2s ease, background .2s ease, transform .2s ease;
+}
+
+.quick-action:last-child {
+    margin-bottom: 0;
+}
+
+.quick-action:hover {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+    transform: translateX(2px);
+    color: var(--text);
+}
+
+.quick-icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    font-size: 18px;
+}
+
+.quick-icon.primary { color: var(--primary); background: var(--primary-soft); }
+.quick-icon.success { color: var(--success); background: var(--success-soft); }
+.quick-icon.warning { color: var(--warning); background: var(--warning-soft); }
+.quick-icon.info    { color: var(--info);    background: var(--info-soft); }
+
+.quick-title {
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.quick-desc {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.quick-arrow {
+    margin-left: auto;
+    color: var(--muted);
+}
+
+/* ---------- Student info row (lists/tables) ---------- */
+
+.student-info {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.student-avatar {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: var(--radius-sm);
+    background: var(--primary-soft);
+    color: var(--primary);
+    font-weight: 800;
+}
+
+.student-name {
+    font-weight: 700;
+    color: var(--text);
+}
+
+.student-username {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+/* ---------- Status pills ---------- */
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.status::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.status-active {
+    color: var(--success);
+    background: var(--success-soft);
+}
+
+.status-inactive {
+    color: var(--danger);
+    background: var(--danger-soft);
 }
 
 /* ---------- Section Heading ---------- */

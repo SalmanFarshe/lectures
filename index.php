@@ -264,6 +264,12 @@ $pageTitle = 'Login';
 
       </form>
 
+      <div class="login-links">
+        <a href="/lectures/forgot-password.php">Forgot password?</a>
+        <span class="link-sep">|</span>
+        <a href="/lectures/register.php">Create account</a>
+      </div>
+
       <div class="login-footer">
         <span class="footer-dot"></span>
         Secure Student Learning Portal

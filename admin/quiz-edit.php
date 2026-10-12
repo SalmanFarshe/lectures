@@ -118,6 +118,7 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
     <div class="page-header-actions">
         <a class="btn btn-outline-secondary" href="/lectures/admin/quizzes.php"><i class="bi bi-arrow-left me-1"></i> All Quizzes</a>
+        <a class="btn btn-outline-primary" href="/lectures/student/quiz-take.php?id=<?= $quizId ?>&preview=1"><i class="bi bi-eye me-1"></i> Preview as Student</a>
     </div>
 </div>
 
