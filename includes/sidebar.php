@@ -68,6 +68,12 @@ $adminMenuItems = [
         'icon' => 'bi-clipboard-check',
         'url' => 'quizzes.php',
     ],
+    [
+        'key' => 'lecturers',
+        'label' => 'Lecturer Requests',
+        'icon' => 'bi-person-plus',
+        'url' => 'lecturers.php',
+    ],
 ];
 
 $studentMenuItems = [
@@ -91,9 +97,30 @@ $studentMenuItems = [
     ],
 ];
 
+$lecturerMenuItems = [
+    [
+        'key' => 'lecturer-dashboard',
+        'label' => 'Lecturer Dashboard',
+        'icon' => 'bi-person-chalkboard',
+        'url' => 'lecturer-dashboard.php',
+    ],
+    [
+        'key' => 'navigator',
+        'label' => 'Notes',
+        'icon' => 'bi-journal-richtext',
+        'url' => 'navigator.php',
+    ],
+    [
+        'key' => 'profile',
+        'label' => 'My Profile',
+        'icon' => 'bi-person-circle',
+        'url' => '../account.php',
+    ],
+];
+
 $menuItems = $isAdmin
     ? $adminMenuItems
-    : $studentMenuItems;
+    : ($userRole === 'lecturer' ? $lecturerMenuItems : $studentMenuItems);
 
 /*
 |--------------------------------------------------------------------------

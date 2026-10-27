@@ -75,6 +75,16 @@ if (ini_get('session.use_cookies')) {
 
 /*
 |--------------------------------------------------------------------------
+| Revoke Remember Me Token
+|--------------------------------------------------------------------------
+| Delete the persistent remember token (if any) so the user is fully
+| signed out across devices/browser restarts.
+*/
+
+clear_remember_token();
+
+/*
+|--------------------------------------------------------------------------
 | Destroy Session
 |--------------------------------------------------------------------------
 */

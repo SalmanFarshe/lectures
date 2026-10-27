@@ -27,6 +27,40 @@ if (!empty($_SESSION['user_id'])) {
 
 /*
 |--------------------------------------------------------------------------
+| Remember Me Auto-Login
+|--------------------------------------------------------------------------
+| If no session exists but a valid remember_token cookie is present,
+| restore the session transparently.
+*/
+
+if (empty($_SESSION['user_id'])) {
+    $rememberUser = validate_remember_token();
+    if ($rememberUser !== null && in_array($rememberUser['role'], ['admin', 'student', 'lecturer'], true)) {
+        if (!session_regenerate_id(true)) {
+            http_response_code(500);
+            exit('Unable to establish a secure session.');
+        }
+
+        $_SESSION['user_id'] = $rememberUser['id'];
+        $_SESSION['username'] = $rememberUser['username'];
+        $_SESSION['full_name'] = $rememberUser['full_name'];
+        $_SESSION['role'] = $rememberUser['role'];
+        $_SESSION['class_id'] = $rememberUser['class_id'] ?? null;
+
+        if ($rememberUser['role'] === 'admin') {
+            redirect('/lectures/admin/navigator.php');
+        }
+
+        if ($rememberUser['role'] === 'lecturer') {
+            redirect('/lectures/admin/lecturer-dashboard.php');
+        }
+
+        redirect('/lectures/student/index.php');
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
 | Login CSRF Token
 |--------------------------------------------------------------------------
 */
@@ -102,7 +136,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                  */
         $role = (string) $user['role'];
 
-        if (!in_array($role, ['admin', 'student'], true)) {
+        if (!in_array($role, ['admin', 'student', 'lecturer'], true)) {
           $error = 'Account role is not permitted.';
         } else {
           /*
@@ -128,8 +162,18 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             random_bytes(32)
           );
 
+          /* Remember Me: set persistent token if requested. */
+          $rememberMe = (($_POST['remember'] ?? '') === 'on');
+          if ($rememberMe) {
+            set_remember_token((int) $user['id'], 30);
+          }
+
           if ($role === 'admin') {
             redirect('/lectures/admin/index.php');
+          }
+
+          if ($role === 'lecturer') {
+            redirect('/lectures/admin/lecturer-dashboard.php');
           }
 
           redirect('/lectures/student/index.php');
@@ -242,6 +286,15 @@ $pageTitle = 'Login';
             autocomplete="current-password"
             placeholder="Enter your password"
             required>
+        </div>
+
+        <div class="form-group remember-me">
+          <input
+            id="remember"
+            name="remember"
+            type="checkbox"
+            value="on">
+          <label for="remember">Remember me on this device</label>
         </div>
 
         <button type="submit" class="login-button">
